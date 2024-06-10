@@ -1,0 +1,439 @@
+{
+	"info": {
+		"_postman_id": "483d67da-d876-401a-a9ed-4378fbacc36e",
+		"name": "Lesson 19 WorkFlows",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1742778"
+	},
+	"item": [
+		{
+			"name": "SignUp",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var randomEmail = \"qweerty\" + Math.floor(Math.random() * 100000) + \"@mail.com\";",
+							"pm.collectionVariables.set(\"email\", randomEmail);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\":\"John\",\r\n  \"lastName\":\"Dou\",\r\n  \"email\":\"{{email}}\",\r\n  \"password\":\"{{password}}\",\r\n  \"repeatPassword\":\"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/auth/signup",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gets user cars",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							"pm.test(\"Content-Type is application/json\", function () { pm.response.to.have.header(\"Content-Type\", \"application/json\"); });",
+							"pm.test(\"Response has data\", function () { pm.expect(jsonData).to.have.property(\"data\"); });",
+							"pm.test(\"Data is an array\", function () { pm.expect(jsonData.data).to.be.an('array'); });",
+							"pm.test(\"Data length is greater than or equal to 0\", function () { pm.expect(jsonData.data.length).to.be.at.least(0); });",
+							"if(pm.expect(jsonData.data.length).to.eql(0)){ postman.setNextRequest(\"Gets car brands\"); } else { pm.collectionVariables.set(\"carId\", jsonData.data[0].id); pm.collectionVariables.set(\"mileage\", jsonData.data[0].mileage); postman.setNextRequest(\"Creates an expense\"); }",
+							"pm.test(\"Each car has an id\", function () { jsonData.data.forEach(function(car) { pm.expect(car).to.have.property(\"id\"); }); });",
+							"pm.test(\"Each car has a brand\", function () { jsonData.data.forEach(function(car) { pm.expect(car).to.have.property(\"brand\"); }); });",
+							"pm.test(\"Each car has a model\", function () { jsonData.data.forEach(function(car) { pm.expect(car).to.have.property(\"model\"); }); });",
+							"pm.test(\"Each car has a mileage\", function () { jsonData.data.forEach(function(car) { pm.expect(car).to.have.property(\"mileage\"); }); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/cars",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gets car brands",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							"pm.test(\"Content-Type is application/json\", function () { pm.response.to.have.header(\"Content-Type\", \"application/json\"); });",
+							"pm.test(\"Response has status\", function () { pm.expect(jsonData).to.have.property(\"status\"); });",
+							"pm.test(\"Status is ok\", function () { pm.expect(jsonData.status).to.eql(\"ok\"); });",
+							"pm.test(\"Response has data\", function () { pm.expect(jsonData).to.have.property(\"data\"); });",
+							"pm.test(\"Data is an array\", function () { pm.expect(jsonData.data).to.be.an('array'); });",
+							"pm.test(\"Data length is greater than 0\", function () { pm.expect(jsonData.data.length).to.be.above(0); });",
+							"pm.test(\"Each brand has an id\", function () { jsonData.data.forEach(function(brand) { pm.expect(brand).to.have.property(\"id\"); }); });",
+							"pm.test(\"Each brand has a name\", function () { jsonData.data.forEach(function(brand) { pm.expect(brand).to.have.property(\"name\"); }); });",
+							"if(pm.expect(jsonData.status).to.eql(\"ok\")){ pm.collectionVariables.set(\"audiBrandId\",jsonData.data[0].id); }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/cars/brands",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cars",
+						"brands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gets car models",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							"pm.test(\"Content-Type is application/json\", function () { pm.response.to.have.header(\"Content-Type\", \"application/json\"); });",
+							"pm.test(\"Response has status\", function () { pm.expect(jsonData).to.have.property(\"status\"); });",
+							"pm.test(\"Status is ok\", function () { pm.expect(jsonData.status).to.eql(\"ok\"); });",
+							"pm.test(\"Response has data\", function () { pm.expect(jsonData).to.have.property(\"data\"); });",
+							"pm.test(\"Data is an array\", function () { pm.expect(jsonData.data).to.be.an('array'); });",
+							"pm.test(\"Data length is greater than 0\", function () { pm.expect(jsonData.data.length).to.be.above(0); });",
+							"pm.test(\"Each model has an id\", function () { jsonData.data.forEach(function(model) { pm.expect(model).to.have.property(\"id\"); }); });",
+							"pm.test(\"Each model has a name\", function () { jsonData.data.forEach(function(model) { pm.expect(model).to.have.property(\"name\"); }); });",
+							"if(pm.expect(jsonData.status).to.eql(\"ok\")){ pm.collectionVariables.set(\"audiTT_Id\",jsonData.data[0].id); }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/cars/models",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cars",
+						"models"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Creates new car",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							"pm.test(\"Content-Type is application/json\", function () { pm.response.to.have.header(\"Content-Type\", \"application/json\"); });",
+							"pm.test(\"Response has data\", function () { pm.expect(jsonData).to.have.property(\"data\"); });",
+							"pm.test(\"Data has brand\", function () { pm.expect(jsonData.data).to.have.property(\"brand\"); });",
+							"pm.test(\"Brand is Audi\", function () { pm.expect(jsonData.data.brand).to.eql(\"Audi\"); });",
+							"pm.test(\"Data has model\", function () { pm.expect(jsonData.data).to.have.property(\"model\"); });",
+							"pm.test(\"Model is TT\", function () { pm.expect(jsonData.data.model).to.eql(\"TT\"); });",
+							"pm.test(\"Data has id\", function () { pm.expect(jsonData.data).to.have.property(\"id\"); });",
+							"pm.test(\"Data has mileage\", function () { pm.expect(jsonData.data).to.have.property(\"mileage\"); });",
+							"pm.test(\"Mileage is correct\", function () { pm.expect(jsonData.data.mileage).to.eql(pm.collectionVariables.get(\"mileage\")); });",
+							"pm.collectionVariables.set(\"carId\", jsonData.data.id);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"mileage\", 1);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carBrandId\": 1,\r\n  \"carModelId\": 1,\r\n  \"mileage\":{{mileage}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/cars",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Creates an expense",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let day = new Date();",
+							"let fullDate = day.getFullYear() + \"-\" +(day.getMonth() + 1) + \"-\" + day.getDate();",
+							"pm.collectionVariables.set(\"fullDate\", fullDate);",
+							"let newMilage = parseInt(pm.collectionVariables.get(\"mileage\")) + 1;",
+							"pm.collectionVariables.set(\"newMilage\", newMilage);",
+							"pm.collectionVariables.set(\"mileage\", newMilage);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							"pm.test(\"Content-Type is application/json\", function () { pm.response.to.have.header(\"Content-Type\", \"application/json\"); });",
+							"pm.test(\"Response has status\", function () { pm.expect(jsonData).to.have.property(\"status\"); });",
+							"pm.test(\"Status is ok\", function () { pm.expect(jsonData.status).to.eql(\"ok\"); });",
+							"pm.test(\"Response has data\", function () { pm.expect(jsonData).to.have.property(\"data\"); });",
+							"pm.test(\"Data has id\", function () { pm.expect(jsonData.data).to.have.property(\"id\"); });",
+							"pm.test(\"Data has carId\", function () { pm.expect(jsonData.data).to.have.property(\"carId\"); });",
+							"pm.test(\"CarId is correct\", function () { pm.expect(jsonData.data.carId).to.eql(pm.collectionVariables.get(\"carId\")); });",
+							"pm.test(\"Data has reportedAt\", function () { pm.expect(jsonData.data).to.have.property(\"reportedAt\"); });",
+							"pm.test(\"ReportedAt is correct\", function () { pm.expect(jsonData.data.reportedAt).to.eql(pm.collectionVariables.get(\"fullDate\")); });",
+							"pm.collectionVariables.set(\"expensesId\", jsonData.data.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carId\": {{carId}},\r\n  \"reportedAt\": \"{{fullDate}}\",\r\n  \"mileage\": {{newMilage}},\r\n  \"liters\": 11,\r\n  \"totalCost\": 11,\r\n  \"forceMileage\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/expenses",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"expenses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
+					},
+					"type": "text/javascript"
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+							"pm.test(\"Content-Type is application/json\", function () { pm.response.to.have.header(\"Content-Type\", \"application/json\"); });",
+							"pm.test(\"Response has status\", function () { pm.expect(jsonData).to.have.property(\"status\"); });",
+							"pm.test(\"Status is ok\", function () { pm.expect(jsonData.status).to.eql(\"ok\"); });",
+							"pm.test(\"Response has data\", function () { pm.expect(jsonData).to.have.property(\"data\"); });",
+							"pm.test(\"Data has id\", function () { pm.expect(jsonData.data).to.have.property(\"id\"); });",
+							"pm.test(\"Data has name\", function () { pm.expect(jsonData.data).to.have.property(\"name\"); });",
+							"pm.test(\"Data has email\", function () { pm.expect(jsonData.data).to.have.property(\"email\"); });",
+							"pm.test(\"Email is correct\", function () { pm.expect(jsonData.data.email).to.eql(pm.collectionVariables.get(\"email\")); });",
+							"pm.test(\"Data has deletion date\", function () { pm.expect(jsonData.data).to.have.property(\"deletedAt\"); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\":\"John\",\r\n  \"lastName\":\"Dou\",\r\n  \"email\":\"{{email}}\",\r\n  \"password\":\"{{password}}\",\r\n  \"repeatPassword\":\"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/users",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": []
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": []
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "https://qauto.forstudy.space/api",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "Test1234",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "newPassword",
+			"value": ""
+		},
+		{
+			"key": "mileage",
+			"value": ""
+		},
+		{
+			"key": "carId",
+			"value": ""
+		},
+		{
+			"key": "audiId",
+			"value": ""
+		},
+		{
+			"key": "bmwId",
+			"value": ""
+		},
+		{
+			"key": "audiTT_Id",
+			"value": ""
+		},
+		{
+			"key": "bmw3Id",
+			"value": ""
+		},
+		{
+			"key": "fullDate",
+			"value": ""
+		},
+		{
+			"key": "newMilage",
+			"value": ""
+		},
+		{
+			"key": "expensesId",
+			"value": ""
+		},
+		{
+			"key": "audiBrandId",
+			"value": ""
+		}
+	]
+}
